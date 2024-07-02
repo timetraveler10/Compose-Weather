@@ -5,7 +5,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Sys(
+@SerialName("sys")
+data class WeatherSys(
     @SerialName("country")
     val country: String,
     @SerialName("sunrise")
