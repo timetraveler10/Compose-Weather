@@ -1,11 +1,11 @@
-package com.hussein.openweather.model
+package com.hussein.openweather.data.model
 
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WeatherApiResponse(
+data class OpenWeatherApiResponse(
     @SerialName("base")
     val base: String,
     @SerialName("clouds")

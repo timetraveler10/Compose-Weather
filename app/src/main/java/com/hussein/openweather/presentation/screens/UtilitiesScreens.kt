@@ -1,4 +1,4 @@
-package com.hussein.openweather.ui.theme.components
+package com.hussein.openweather.presentation.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +16,8 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ErrorScreen(modifier: Modifier = Modifier, errorMsg: String) {
+fun ErrorScreen(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = errorMsg)
+        content()
     }
 }

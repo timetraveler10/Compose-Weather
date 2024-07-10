@@ -1,4 +1,4 @@
-package com.hussein.openweather.model
+package com.hussein.openweather.data.model
 
 
 import kotlinx.serialization.SerialName
