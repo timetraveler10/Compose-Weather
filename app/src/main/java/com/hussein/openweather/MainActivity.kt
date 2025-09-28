@@ -1,92 +1,64 @@
 package com.hussein.openweather
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.widget.Toast
+import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.hussein.openweather.ui.theme.OpenWeatherTheme
-import com.hussein.openweather.utils.UserLocationManager
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
+import com.hussein.openweather.data.preferences.DatastoreManager
+import com.hussein.openweather.presentation.screens.Navigation
+import com.hussein.openweather.presentation.screens.Screens
+import com.hussein.openweather.presentation.ui.theme.OpenWeatherTheme
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    val datastoreManager: DatastoreManager by inject()
+    var onboardingState: Boolean? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-
         super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
-        setContent {
+        installSplashScreen().setKeepOnScreenCondition {
+            onboardingState == null
+        }
+        lifecycleScope.launch {
+            val finished = datastoreManager.onBoardingCompletedState.first()
+            onboardingState = finished
+        }
 
-            val permissionLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestPermission(),
-                onResult = {
-                    if (it) {
-                        Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            OpenWeatherTheme {
-                LaunchedEffect(key1 = true) {
-                    permissionLauncher.launch(android.Manifest.permission.ACCESS_COARSE_LOCATION)
-                }
-                var latLng by remember {
-                    mutableStateOf("")
-                }
-                val userLocationManager = remember {
-                    UserLocationManager(this, onSuccess = {
-                        latLng = "${it.latitude},${it.longitude} "
+        setContent{
+            val startDestination =
+                if (onboardingState == true) Screens.Main else Screens.OnboardingScreen
 
-                    }, onError = {
-                        latLng = it
-                    })
-
-                }
-
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-                        Text(text = latLng)
-                        Button(onClick = {
-                            userLocationManager.getLocation()
-                        }) {
-                            Text(text = "Get Location")
-                        }
-
-
-                    }
-                }
+            OpenWeatherTheme(
+                dynamicColor = true
+            ) {
+                Navigation(
+                    onOpenAppSettings = ::openApplicationSettings,
+                    openLocationSettings = ::openLocationSettings,
+                    startDestination = startDestination
+                )
             }
         }
+    }
+
+    private fun openApplicationSettings() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+        val uri = Uri.fromParts("package", packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+    private fun openLocationSettings() {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        startActivity(intent)
     }
 
 }

@@ -16,8 +16,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+
     }
 }
 
-rootProject.name = "OpenWeather"
+rootProject.name = "Compose Weather"
 include(":app")

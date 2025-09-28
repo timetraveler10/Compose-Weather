@@ -2,4 +2,8 @@
 <resources>
 
     <style name="Theme.OpenWeather" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="MySplashScreen" parent="Theme.SplashScreen">
+        <item name="android:duration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.OpenWeather</item>
+    </style>
 </resources>
