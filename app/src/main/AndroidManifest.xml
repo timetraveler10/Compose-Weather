@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAJ5r-OqAB4OYCP_IHcUpe9K2dXWB8O_Tw" />
+            android:value="" />
     </application>
 
 </manifest>
